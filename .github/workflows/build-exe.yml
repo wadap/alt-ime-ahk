@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download AutoHotkey v1
         shell: pwsh
@@ -47,7 +47,7 @@ jobs:
           "$hash  alt-ime-ahk.exe" | Set-Content ".\dist\alt-ime-ahk.exe.sha256"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: alt-ime-ahk-windows
           path: |

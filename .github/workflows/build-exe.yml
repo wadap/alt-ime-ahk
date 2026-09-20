@@ -24,7 +24,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "1.1.37.02"
-          $url = "https://www.autohotkey.com/download/1.1/AutoHotkey_$version.zip"
+          $url = "https://github.com/AutoHotkey/AutoHotkey/releases/download/v$version/AutoHotkey_$version.zip"
           Invoke-WebRequest -Uri $url -OutFile autohotkey.zip
           Expand-Archive autohotkey.zip -DestinationPath autohotkey
 

@@ -109,7 +109,6 @@
 
 ; 上部メニューがアクティブになるのを抑制
 *~LAlt::Send {Blind}{vk07}
-*~RAlt::Send {Blind}{vk07}
 
 ; 左 Alt 空打ちで IME を OFF
 LAlt up::
@@ -119,10 +118,21 @@ LAlt up::
     }
     Return
 
-; 右 Alt 空打ちで IME を ON
-RAlt up::
-    if (A_PriorHotkey == "*~RAlt")
+; Mac キーボード右側用
+; 右 Command (RWin) を右 Alt として扱い、空打ちで IME を ON
+; 右 Option (RAlt) は右 Win として扱う
+*RWin::
+    Send {Blind}{RAlt Down}
+    Send {Blind}{vk07}
+    Return
+
+*RWin up::
+    Send {Blind}{RAlt Up}
+    if (A_PriorHotkey == "*RWin")
     {
         IME_SET(1)
     }
     Return
+
+*RAlt::Send {Blind}{RWin Down}
+*RAlt up::Send {Blind}{RWin Up}

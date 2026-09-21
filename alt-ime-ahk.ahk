@@ -1,8 +1,10 @@
-; 左右 Alt キーの空打ちで IME の OFF/ON を切り替える
+; Mac キーボードの Command / Option を Windows 向けに入れ替え、
+; 左右 Command キーの空打ちで IME の OFF/ON を切り替える
 ;
-; 左 Alt キーの空打ちで IME を「英数」に切り替え
-; 右 Alt キーの空打ちで IME を「かな」に切り替え
-; Alt キーを押している間に他のキーを打つと通常の Alt キーとして動作
+; 左 Command (LWin) -> 左 Alt、空打ちで IME OFF（英数）
+; 左 Option  (LAlt) -> 左 Win
+; 右 Command (RWin) -> 右 Alt、空打ちで IME ON（かな）
+; 右 Option  (RAlt) -> 右 Win
 ;
 ; Author:     karakaram   http://www.karakaram.com/alt-ime-on-off
 
@@ -107,18 +109,26 @@
 *~PgDn::
     Return
 
-; 上部メニューがアクティブになるのを抑制
-*~LAlt::Send {Blind}{vk07}
+; Mac キーボード左側
+; 左 Command (LWin) を左 Alt として扱い、空打ちで IME を OFF
+; 左 Option (LAlt) は左 Win として扱う
+*LWin::
+    Send {Blind}{LAlt Down}
+    Send {Blind}{vk07}
+    Return
 
-; 左 Alt 空打ちで IME を OFF
-LAlt up::
-    if (A_PriorHotkey == "*~LAlt")
+*LWin up::
+    Send {Blind}{LAlt Up}
+    if (A_PriorHotkey == "*LWin")
     {
         IME_SET(0)
     }
     Return
 
-; Mac キーボード右側用
+*LAlt::Send {Blind}{LWin Down}
+*LAlt up::Send {Blind}{LWin Up}
+
+; Mac キーボード右側
 ; 右 Command (RWin) を右 Alt として扱い、空打ちで IME を ON
 ; 右 Option (RAlt) は右 Win として扱う
 *RWin::

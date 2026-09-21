@@ -62,7 +62,22 @@ jobs:
             dist/alt-ime-ahk.exe
             dist/alt-ime-ahk.exe.sha256
 
-      - name: Publish GitHub Release
+      - name: Publish latest downloadable build
+        if: github.ref == 'refs/heads/master'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --cleanup-tag --yes 2>$null
+          gh release create latest `
+            ".\dist\alt-ime-ahk.exe" `
+            ".\dist\alt-ime-ahk.exe.sha256" `
+            --target "${{ github.sha }}" `
+            --title "Latest build" `
+            --notes "Automated build from commit ${{ github.sha }}." `
+            --prerelease
+
+      - name: Publish versioned GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
         env:

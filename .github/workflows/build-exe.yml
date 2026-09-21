@@ -32,27 +32,20 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          $args = @(
-            "/in", ".\alt-ime-ahk.ahk",
-            "/out", ".\dist\alt-ime-ahk.exe",
-            "/bin", ".\autohotkey\Compiler\Unicode 64-bit.bin"
-          )
-          $proc = Start-Process ".\autohotkey\Compiler\Ahk2Exe.exe" -ArgumentList $args -PassThru
+          & ".\autohotkey\Compiler\Ahk2Exe.exe" `
+            /in ".\alt-ime-ahk.ahk" `
+            /out ".\dist\alt-ime-ahk.exe" `
+            /bin ".\autohotkey\Compiler\Unicode 64-bit.bin"
 
+          # Ahk2Exe may return before its compiler child has finished writing the file.
+          # Poll for the actual output instead of waiting on the launcher process.
           $deadline = (Get-Date).AddSeconds(30)
           while ((Get-Date) -lt $deadline -and -not (Test-Path ".\dist\alt-ime-ahk.exe")) {
             Start-Sleep -Milliseconds 250
           }
 
           if (-not (Test-Path ".\dist\alt-ime-ahk.exe")) {
-            if (-not $proc.HasExited) {
-              Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
-            }
             throw "Compilation failed: dist\alt-ime-ahk.exe was not created within 30 seconds."
-          }
-
-          if (-not $proc.HasExited) {
-            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
           }
 
       - name: Generate SHA-256

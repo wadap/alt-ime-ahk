@@ -37,12 +37,22 @@ jobs:
             "/out", ".\dist\alt-ime-ahk.exe",
             "/bin", ".\autohotkey\Compiler\Unicode 64-bit.bin"
           )
-          $proc = Start-Process ".\autohotkey\Compiler\Ahk2Exe.exe" -ArgumentList $args -Wait -PassThru
-          if ($proc.ExitCode -ne 0) {
-            throw "Ahk2Exe failed with exit code $($proc.ExitCode)."
+          $proc = Start-Process ".\autohotkey\Compiler\Ahk2Exe.exe" -ArgumentList $args -PassThru
+
+          $deadline = (Get-Date).AddSeconds(30)
+          while ((Get-Date) -lt $deadline -and -not (Test-Path ".\dist\alt-ime-ahk.exe")) {
+            Start-Sleep -Milliseconds 250
           }
+
           if (-not (Test-Path ".\dist\alt-ime-ahk.exe")) {
-            throw "Compilation failed: dist\alt-ime-ahk.exe was not created."
+            if (-not $proc.HasExited) {
+              Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+            }
+            throw "Compilation failed: dist\alt-ime-ahk.exe was not created within 30 seconds."
+          }
+
+          if (-not $proc.HasExited) {
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
           }
 
       - name: Generate SHA-256
